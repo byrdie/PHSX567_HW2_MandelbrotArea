@@ -1,6 +1,45 @@
 1.	There are 4 files used to complete this assignment. 1 procedure and 3 functions.
 
-2.	Running the assignment is simple. Simply type
-	octave:102> solution3
+-----------------------------------------------------
 
-3. Please see the attached plots 
+2.	Running the assignment is simple. Simply type 'octave:102> solution3'
+
+-----------------------------------------------------
+
+3. Please see the attached plots.
+ 
+a. I was able to estimate the power, but not the prefactor. My fitting algorithm was able to deal with y=ax^c power laws, but not more complex polynomials, y=ax^c+b for example. But my plots at least have the appropriate slope as far as I can tell.
+
+b. Same as part a.
+
+c. It's pretty!
+
+-----------------------------------------------------
+
+4. Questions
+
+a. My program calculated an area of 1.499200, using 1e4 stratified Monte-Carlo samples, and a maximum count of 1e3.
+
+b. Using the Mathematica command: '1.499200 - Sum[10 i^-2.200652, {i, 10000, Infinity}]' returns the value 1.49907.
+
+c. For random sampling the convergence goes as N to the -0.65 power. For stratified sampling, the convergence goes as N to the -0.47 power.
+
+d. I expect the uncertainty in the estimate is equivalent to the standard deviation, given the count. So 1e3^(-0.47) = 0.0389045. This number seems high considering the answer 2 part b. is within a thousanth of the actual answer.
+
+e. The new expression would be O(N^(-1/2 - 1/2v - 1/2(q + 1))).
+
+f. -0.47 = -1/2 -1/2 - 1/(q+1) --> q = -2.88. Negative dimensionality doesn't seem very physical, does it?
+
+
+
+
+
+
+
+
+
+
+
+
+
+

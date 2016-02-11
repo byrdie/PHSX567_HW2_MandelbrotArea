@@ -21,13 +21,13 @@ printf("	QUESTION 1: Total area with random sampling is %f \n", rand_area(end) /
 % Compute the change in area and plot a power law trend
 dA = (shift(rand_area,1)- rand_area) ./ numpoints .* tot_sampl_area;
 x = 1:length(dA);
-P = polyfit(log(x(2:10)), log(dA(2:10)), 1);
+P = polyfit(log(x(2:10)), log(dA(2:10)), 1)
 printf("	QUESTION 2: The power law exponent for the change in area is %f \n", P(1))
 
 figure(1)
 loglog(x(dA > 0), dA(dA > 0));
 hold on
-loglog(x, 10 .* x.^(P(1)), 'r')
+loglog(x, exp(P(2)) .* x.^(P(1)), 'r');
 hold off
 title("Decrease in Area vs. n");
 xlabel("n");
@@ -76,10 +76,10 @@ hold on
 loglog(x, std_dev_strat, 'g')
 
 % Determine the power law for standard deviation convergence
-Pr = polyfit(log(x'(1:2)), log(std_dev_rand(1:2)), 1);
-Ps = polyfit(log(x'(1:2)), log(std_dev_strat(1:2)), 1);
-loglog(x, 3.5*std_dev_rand(1) * x.^Pr(1), '--r')
-loglog(x, 5.3*std_dev_strat(1) * x.^Ps(1), '--c')
+Pr = polyfit(log(x'(1:10)), log(std_dev_rand(1:10)), 1);
+Ps = polyfit(log(x'(1:10)), log(std_dev_strat(1:10)), 1);
+loglog(x, 4.5e2*exp(Pr(2)) .* std_dev_rand(1) * x.^Pr(1), '--r');
+loglog(x, 4.9e2*exp(Ps(2)) .* std_dev_strat(1) * x.^Ps(1), '--c');
 hold off
 title("Standard deviation in random/stratified sampling vs. N");
 xlabel("N");
@@ -90,7 +90,7 @@ printf("	QUESTION 4: The standard deviation for random sampling goes as N to the
 printf("		The standard deviation for stratified sampling goes as N to the %f power \n", Ps(1))
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% QUESTION 3
+% QUESTION 5
 % Plot image of the Mandelbrot set.
 
 xpix = 100;	% number of pixels in horizontal direction
@@ -114,7 +114,7 @@ C = N;
 Z = N;
 for x = 1:xpix
 	for y = 1:ypix
-		m = x * dx * totalX - totalX/2;
+		m = x * dx * totalX - 2*totalX/3;
 		n = y * dy * totalY - totalY/2;
 		C(y,x) = m + n * i;		
 	endfor
@@ -132,6 +132,7 @@ endfor
 
 figure(3)
 imshow(N, cool());
+imwrite(N, cool(), "mandelbrot.tif");
 
 printf("\n\n")
 
