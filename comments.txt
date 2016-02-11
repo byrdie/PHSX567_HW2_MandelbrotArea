@@ -1,0 +1,6 @@
+1.	There are 4 files used to complete this assignment. 1 procedure and 3 functions.
+
+2.	Running the assignment is simple. Simply type
+	octave:102> solution3
+
+3. Please see the attached plots 

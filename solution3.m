@@ -4,32 +4,96 @@
 % Homework 4: Mandelbrot set area
 % This code uses Monte Carlo random and stratified random sampling to estimate the area and plot the Mandelbrot set
 
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % QUESTION 1
 % Monte Carlo estimation of Mandelbrot set area using random sampling 
 
 count = 1e2;		% number of iterations into Mandelbrot set
-numpoints = 1e2;	% Number of Monte Carlo samples
+numpoints = 1e4;	% Number of Monte Carlo samples
 tot_sampl_area = 16;	% Total area of the Monte Carlo sample set
 
 
-samples = rand(numpoints,1); % Sample real axis
-samples += rand(numpoints,1) * i;	% Sample imag. axis
-c = samples .* 4 - 2*(1 + i); % Rescale samples
-c = c(abs(c) < 2);	% eliminate any points with |z| < 2, since we know this ahead of time.
+rand_area = mandelArea_MCrandom(count, numpoints);
+printf("	QUESTION 1: Total area with random sampling is %f \n", rand_area(end) / numpoints * tot_sampl_area);
 
-% Iterate through mapping
-zn = mandel(c, c, count);
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% QUESTION 2
+% Compute the change in area and plot a power law trend
+dA = (shift(rand_area,1)- rand_area) ./ numpoints .* tot_sampl_area;
+x = 1:length(dA);
+P = polyfit(log(x(2:10)), log(dA(2:10)), 1);
+printf("	QUESTION 2: The power law exponent for the change in area is %f \n", P(1))
 
-%zn = zn(abs(zn) < 2);
-length(zn)
-area = (length(zn)/numpoints)*tot_sampl_area	% compute the area
+figure(1)
+loglog(x(dA > 0), dA(dA > 0));
+hold on
+loglog(x, 10 .* x.^(P(1)), 'r')
+hold off
+title("Decrease in Area vs. n");
+xlabel("n");
+ylabel("Decrease in Area");
+legend("Observed change", "Power law trend");
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% QUESTION 3
+% Compute the area of the mandelbrot set using stratified random sampling
 
+strat_area = mandelArea_MCstrat(count, numpoints);
+
+printf("	QUESTION 3: Total area with stratified random sampling is: %f \n", strat_area(end) / numpoints * tot_sampl_area)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% QUESTION 4
+% Determine the standard deviation of the both Monte Carlo techniques and plot power law trend
+r = [];
+s = [];
+rArea = [];	% Allocate space for area measurements
+sArea = [];
+for n = 10:500:numpoints+10
+	for d = 0:9
+
+		% Have each row hold the area calculation for each run
+		r = [r mandelArea_MCrandom(count, n)(end)];
+		s = [s mandelArea_MCstrat(count, n)(end)];
+
+	endfor
+	
+	rArea = [rArea; r / n * tot_sampl_area];	% Stick result into next row of array
+	sArea = [sArea; s / n * tot_sampl_area];
+	r = [];
+	s = [];	% Clear memory
+	
+endfor
+
+std_dev_rand = std(rArea / numpoints * tot_sampl_area, 0, 2);
+std_dev_strat = std(sArea / numpoints * tot_sampl_area, 0, 2);
+
+% Plot the standard deviation as a function of N
+figure(2);
+x = 10:500:numpoints+10;
+loglog(x, std_dev_rand);
+hold on
+loglog(x, std_dev_strat, 'g')
+
+% Determine the power law for standard deviation convergence
+Pr = polyfit(log(x'(1:2)), log(std_dev_rand(1:2)), 1);
+Ps = polyfit(log(x'(1:2)), log(std_dev_strat(1:2)), 1);
+loglog(x, 3.5*std_dev_rand(1) * x.^Pr(1), '--r')
+loglog(x, 5.3*std_dev_strat(1) * x.^Ps(1), '--c')
+hold off
+title("Standard deviation in random/stratified sampling vs. N");
+xlabel("N");
+ylabel("Standard deviation");
+legend("Random Observed", "Stratified Observed", "Random Trend", "Stratified Trend");
+
+printf("	QUESTION 4: The standard deviation for random sampling goes as N to the %f power \n", Pr(1));
+printf("		The standard deviation for stratified sampling goes as N to the %f power \n", Ps(1))
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % QUESTION 3
 % Plot image of the Mandelbrot set.
 
-xpix = 10000;	% number of pixels in horizontal direction
+xpix = 100;	% number of pixels in horizontal direction
 
 % Store properties of the set for later
 maxX = 1;	% maximum x value of set
@@ -66,10 +130,10 @@ for k = 1:count
 	
 endfor
 
-imshow(N, rainbow());
+figure(3)
+imshow(N, cool());
 
-
-
+printf("\n\n")
 
 
 

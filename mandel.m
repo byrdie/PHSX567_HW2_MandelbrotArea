@@ -1,14 +1,19 @@
 % Define recursive function to compute if a point
 % is in the Mandelbrot set
-function result=mandel(zn, c, count)
+function A = mandel(c, count)
 	
-	for z = 1:count
+	area = [];	% Store the change in area for plotting later
+	zn = c;
+	inc = logical(ones(1,length(zn)));
+	
+	for k = 1:count
 
-		zn = zn .* zn .+ c;	% Compute the next mapping
-		c = c(abs(zn) < 2);
-		zn = zn(abs(zn) < 2);	% Eliminate any points
+		zn(inc) = zn(inc) .* zn(inc) .+ c(inc);	% Compute the next mapping
+		inc = logical(abs(zn) < 2);
+		area = [area length(zn(inc))];
 	
 	endfor
-	result = zn;
+	
+	A = area;
 		
 endfunction
